@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/jQuerymin.js"></script>
+		<style type="text/css">
+			.father{
+				width: 800px;
+				height: 1000px;
+				border: 1px solid #ccc;
+				margin: 20px auto;
+				text-align: center;
+			}
+			.top{
+				height: 30px;
+				border: 1px solid #ccc;
+				padding: 30px;
+			}
+			table{
+				margin-top: 10px;
+				width: 800px;
+				/*设置单元格的合并边框问题*/
+				border-collapse: collapse;  
+				text-align: center;
+			}
+			th,td{
+				height: 30px;
+			}
+			a{
+				text-decoration: none;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="father">
+			<h3>图书管理系统</h3>
+			<div class="top">
+				<input type="text" class="bookname" placeholder="图书名称"/>
+				<input type="text" class="zuozhe" placeholder="作者"/>
+				<input type="text" class="chubanshe" placeholder="出版社"/>
+				<button>新增</button>
+			</div>
+			<div class="bottom">
+				<table border="" >
+					<thead>
+						<tr>
+						<th>id</th>
+						<th>图书名称</th>
+						<th>作者</th>
+						<th>出版社</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+					<!--<tr clas="bdata">
+						<td>1</td>
+						<td>红楼梦</td>
+						<td>曹雪芹</td>
+						<td>天津出版社</td>
+						<td><a href="javascript:;">删除</a></td>
+					</tr>-->
+				</table>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$(function(){
+		
+				//创建一个获取数据的函数
+				function getData(){
+					$.get("http://www.liulongbin.top:3006/api/getbooks",function(res){
+						//return就是终止后面的代码
+						if(res.status!==200){
+							return alert("图书获取数据失败");
+						}
+						//第一种方式：定义一个空数组，用来接收所有的tr
+//						var str=[];  
+//						//循环整个data对象
+//						$.each(res.data,function(index,value){
+//							str.push("<tr><td>"+value.id+"</td><td>"+value.bookname+"</td><td>"+value.author+"</td><td>"+value.publisher+"</td><td><a>删除</a></td></tr>");
+//							console.log("2")
+//						})
+//						$("table").empty().append(str.join(""));
+						
+						//第二种：定义个空串，用来接收所有的tr
+						var str="";  
+						//循环整个data对象
+						$.each(res.data,function(index,value){
+							str += ("<tr><td>"+value.id+"</td><td>"+value.bookname+"</td><td>"+value.author
+							+"</td><td>"+value.publisher+"</td><td><a data-index="+value.id+">删除</a></td></tr>");
+						})
+						$("tbody").empty().append(str);
+					})
+				}
+				getData();
+				
+				
+				//新增图书信息的函数
+				$("button").on("click",function(){
+				var bookname = $(".bookname").val().trim();
+				var zuozhe = $(".zuozhe").val().trim();
+				var chubanshe = $(".chubanshe").val().trim();
+				
+					if(bookname.length<=0 || zuozhe.length<=0  || chubanshe.length<=0 ){
+						return alert("信息不能为空");
+					}
+					//新增ajax请求
+					$.ajax({
+						type:"post",
+						url:"http://www.liulongbin.top:3006/api/addbook",
+						data:{bookname:bookname,
+							author:zuozhe,
+							publisher:chubanshe
+						},
+						success:function(res){
+							if(res.status !== 201){
+								return alert("添加失败");
+							}
+							
+						}
+				
+					})
+					
+					getData();
+					//清空文本框
+					$(".bookname").val("");
+					$(".zuozhe").val("");
+					$(".chubanshe").val("");
+				})
+				
+				//删除 图书信息的函数
+				$("tbody").on("click","a",function(){
+					var id = $(this).attr("data-index");
+					$.get("http://www.liulongbin.top:3006/api/delbook",{id:id},function(res){
+						if(res.status !== 200){
+							return  alert("删除失败");
+						}
+						getData();
+					})
+					
+				})
+			})
+		</script>
+	</body>
+</html>

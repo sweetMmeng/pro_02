@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/jQuerymin.js"></script>
+		<script src="lib/axios.js"></script>
+	</head>
+	<body>
+		<button>axios的get数据请求</button>
+		<script type="text/javascript">
+			$("button").on("click",function(){
+				var urlinfo = 'http://www.liulangbin.top:3006/api/get';
+				var paraminfo = {name:'zs',age:20};
+				
+				axios.get(urlinfo,{params:paraminfo}).then(function(res){
+					console.log(res);
+				})
+			})
+		</script>
+	</body>
+</html>
